@@ -1,6 +1,7 @@
 import type { LoaderFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { Link, useLoaderData } from '@remix-run/react';
+import { getAllPeople } from '~/model/people.server';
 
 interface LoaderData {
   people: Array<{
@@ -10,21 +11,14 @@ interface LoaderData {
   }>;
 }
 
-export const loader: LoaderFunction = () => {
-  const people = [
-    {
-      id: 1,
-      firstName: 'James',
-      lastName: 'Cooper',
-    },
-  ];
+export const loader: LoaderFunction = async () => {
+  const people = await getAllPeople();
 
   return json({ people });
 };
 
 export default function PeopleRoute() {
   let { people } = useLoaderData<LoaderData>();
-  console.log(people);
 
   return (
     <main className="flex flex-col items-center">
@@ -33,10 +27,13 @@ export default function PeopleRoute() {
       </h1>
 
       {people.length > 0 ? (
-        <ul>
+        <ul
+          role="presentation"
+          className="grid grid-cols-1 py-6 px-4 divide-y divide-slate-200 shadow-md border rounded"
+        >
           {people.map(person => (
-            <li key={person.id}>
-              <p className="text-2xl">
+            <li key={person.id} className="px-8 mb-2">
+              <p className="text-lg">
                 {person.firstName} {person.lastName}
               </p>
             </li>
@@ -46,6 +43,7 @@ export default function PeopleRoute() {
         <p className="text-center"></p>
       )}
 
+      {/* Footer */}
       <div className="mt-8">
         <Link
           to="/"
