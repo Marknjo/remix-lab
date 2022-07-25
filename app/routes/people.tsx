@@ -119,7 +119,7 @@ export default function PeopleRoute() {
                   <button
                     name="_action"
                     value={ActionTypes.DELETE}
-                    className="text-sm text-red-400 font-bold hover:text-red-500"
+                    className="text-sm text-gray-400 font-bold hover:text-red-500"
                   >
                     X
                   </button>
