@@ -1,6 +1,6 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { Form, Link, useLoaderData } from '@remix-run/react';
+import { Form, Link, useLoaderData, useTransition } from '@remix-run/react';
 import invariant from 'tiny-invariant';
 import { createPerson, getAllPeople } from '~/model/people.server';
 
@@ -47,6 +47,9 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function PeopleRoute() {
   let { people } = useLoaderData<LoaderData>();
+  const transition = useTransition();
+
+  const isSubmitting = transition.state === 'submitting';
 
   return (
     <main className="flex flex-col items-center">
@@ -98,8 +101,11 @@ export default function PeopleRoute() {
         </div>
 
         <div className="mb-8 inline-block">
-          <button className="bg-green-200 rounded-md py-2 px-8 font-semibold text-green-800 shadow-sm transition hover:shadow-md hover:-translate-y-0.5 active:translate-y-[0.3]">
-            Add
+          <button
+            disabled={isSubmitting}
+            className="bg-green-200 rounded-md py-2 px-8 font-semibold text-green-800 shadow-sm transition hover:shadow-md hover:-translate-y-0.5 active:translate-y-[0.3]"
+          >
+            {isSubmitting ? 'Adding...' : 'Add'}
           </button>
         </div>
       </Form>
