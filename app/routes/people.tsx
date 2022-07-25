@@ -1,6 +1,7 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { Form, Link, useLoaderData, useTransition } from '@remix-run/react';
+import { useEffect, useRef } from 'react';
 import invariant from 'tiny-invariant';
 import { createPerson, getAllPeople } from '~/model/people.server';
 
@@ -10,6 +11,11 @@ interface LoaderData {
     firstName: string;
     lastName: string;
   }>;
+}
+
+enum ActionTypes {
+  CREATE = 'CREATE',
+  DELETE = 'DELETE',
 }
 
 export const loader: LoaderFunction = async () => {
@@ -49,7 +55,16 @@ export default function PeopleRoute() {
   let { people } = useLoaderData<LoaderData>();
   const transition = useTransition();
 
-  const isSubmitting = transition.state === 'submitting';
+  const createFormRef = useRef<HTMLFormElement>(null);
+  const isAdding =
+    transition.state === 'submitting' &&
+    transition.submission?.formData.get('_action') === ActionTypes.CREATE;
+
+  useEffect(() => {
+    if (!isAdding) {
+      createFormRef.current?.reset();
+    }
+  }, [isAdding]);
 
   return (
     <main className="flex flex-col items-center">
@@ -77,6 +92,7 @@ export default function PeopleRoute() {
       <Form
         method="post"
         className="flex justify-center mt-10 mw-5/6 space-x-4 px-8 py-6 shadow-md border rounded"
+        ref={createFormRef}
       >
         <div className="mb-8 inline-block">
           <input
@@ -102,10 +118,12 @@ export default function PeopleRoute() {
 
         <div className="mb-8 inline-block">
           <button
-            disabled={isSubmitting}
+            name="_action"
+            value={ActionTypes.CREATE}
+            disabled={!!isAdding}
             className="bg-green-200 rounded-md py-2 px-8 font-semibold text-green-800 shadow-sm transition hover:shadow-md hover:-translate-y-0.5 active:translate-y-[0.3]"
           >
-            {isSubmitting ? 'Adding...' : 'Add'}
+            {isAdding ? 'Adding...' : 'Add'}
           </button>
         </div>
       </Form>
