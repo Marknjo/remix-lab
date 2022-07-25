@@ -56,6 +56,8 @@ export default function PeopleRoute() {
   const transition = useTransition();
 
   const createFormRef = useRef<HTMLFormElement>(null);
+  const firstNameRef = useRef<HTMLInputElement>(null);
+
   const isAdding =
     transition.state === 'submitting' &&
     transition.submission?.formData.get('_action') === ActionTypes.CREATE;
@@ -63,6 +65,7 @@ export default function PeopleRoute() {
   useEffect(() => {
     if (!isAdding) {
       createFormRef.current?.reset();
+      firstNameRef.current?.focus();
     }
   }, [isAdding]);
 
@@ -97,6 +100,7 @@ export default function PeopleRoute() {
         <div className="mb-8 inline-block">
           <input
             aria-label="firstname"
+            ref={firstNameRef}
             type="text"
             name="firstName"
             id="firstname"
