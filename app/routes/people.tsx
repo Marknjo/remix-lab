@@ -3,7 +3,11 @@ import { json } from '@remix-run/node';
 import { Form, Link, useLoaderData, useTransition } from '@remix-run/react';
 import { useEffect, useRef } from 'react';
 import invariant from 'tiny-invariant';
-import { createPerson, getAllPeople } from '~/model/people.server';
+import {
+  createPerson,
+  deletePerson,
+  getAllPeople,
+} from '~/model/people.server';
 
 interface LoaderData {
   people: Array<{
@@ -24,6 +28,13 @@ export const loader: LoaderFunction = async () => {
   return json({ people });
 };
 
+interface ActionData {
+  firstName: string;
+  lastName: string;
+  id: string;
+  _action: ActionTypes;
+}
+
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
 
@@ -40,19 +51,36 @@ export const action: ActionFunction = async ({ request }) => {
     'Must provide a last name value as a string'
   );
 
-  const data = {
-    firstName: userObj.firstName as string,
-    lastName: userObj.lastName as string,
-  };
+  const submittedPerson = userObj as unknown as ActionData;
 
-  /// Create a user with the values
-  await createPerson(data);
+  if (submittedPerson._action === ActionTypes.CREATE) {
+    /// Create a user with the values
+
+    await createPerson({
+      firstName: submittedPerson.firstName,
+      lastName: submittedPerson.lastName,
+    });
+  }
+
+  if (submittedPerson._action === ActionTypes.DELETE) {
+    console.log({ id: submittedPerson.id });
+
+    /// Delete user
+    const isPersonDeleted = await deletePerson(submittedPerson.id);
+
+    if (!isPersonDeleted) {
+      throw json(`User with the id ${submittedPerson.id} not deleted`, {
+        status: 400,
+      });
+    }
+  }
 
   return null;
 };
 
 export default function PeopleRoute() {
   let { people } = useLoaderData<LoaderData>();
+
   const transition = useTransition();
 
   const createFormRef = useRef<HTMLFormElement>(null);
@@ -82,9 +110,21 @@ export default function PeopleRoute() {
         >
           {people.map(person => (
             <li key={person.id} className="px-8 mb-2">
-              <p className="text-lg">
-                {person.firstName} {person.lastName}
-              </p>
+              <div className="text-lg inline-block space-x-4 py-2">
+                <p className="inline-block">
+                  {person.firstName} {person.lastName}
+                </p>
+                <Form method="post" className="inline-block">
+                  <input type="hidden" name="id" defaultValue={person.id} />
+                  <button
+                    name="_action"
+                    value={ActionTypes.DELETE}
+                    className="text-sm text-red-400 font-bold hover:text-red-500"
+                  >
+                    X
+                  </button>
+                </Form>
+              </div>
             </li>
           ))}
         </ul>

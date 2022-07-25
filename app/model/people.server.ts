@@ -10,3 +10,11 @@ export async function createPerson(
 ) {
   return db.people.create({ data: person });
 }
+
+export async function deletePerson(userId: string) {
+  if (!userId) {
+    return null;
+  }
+
+  return db.people.delete({ where: { id: userId } });
+}
