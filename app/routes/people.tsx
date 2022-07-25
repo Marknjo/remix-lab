@@ -1,4 +1,4 @@
-import type { ActionFunction, LoaderFunction, Response } from '@remix-run/node';
+import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { Form, Link, useLoaderData } from '@remix-run/react';
 import { getAllPeople } from '~/model/people.server';
@@ -37,7 +37,7 @@ export default function PeopleRoute() {
       {people.length > 0 ? (
         <ul
           role="presentation"
-          className="grid grid-cols-1 py-6 px-4 divide-y divide-slate-200 shadow-md border rounded"
+          className="grid grid-cols-1 py-6 px-4 divide-y divide-slate-200 shadow-sm mw-5/6"
         >
           {people.map(person => (
             <li key={person.id} className="px-8 mb-2">
@@ -53,9 +53,9 @@ export default function PeopleRoute() {
 
       <Form
         method="post"
-        className="mt-10 grid grid-cols-3 gap-4 py-6 px-4 shadow-md border rounded"
+        className="flex justify-center mt-10 mw-5/6 space-x-4 px-8 py-6 shadow-md border rounded"
       >
-        <div className="px-8 mb-8">
+        <div className="mb-8 inline-block">
           <input
             aria-label="firstname"
             type="text"
@@ -66,7 +66,7 @@ export default function PeopleRoute() {
           />
         </div>
 
-        <div className="px-8 mb-8">
+        <div className="mb-8 inline-block">
           <input
             aria-label="lastname"
             type="text"
@@ -77,7 +77,7 @@ export default function PeopleRoute() {
           />
         </div>
 
-        <div className="px-8 mb-8">
+        <div className="mb-8 inline-block">
           <button className="bg-green-200 rounded-md py-2 px-8 font-semibold text-green-800 shadow-sm transition hover:shadow-md hover:-translate-y-0.5 active:translate-y-[0.3]">
             Add
           </button>
