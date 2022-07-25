@@ -18,6 +18,7 @@ specifiers:
   react: ^17.0.2
   react-dom: ^17.0.2
   tailwindcss: ^3.1.6
+  tiny-invariant: ^1.2.0
   typescript: ^4.7.4
 
 dependencies:
@@ -27,6 +28,7 @@ dependencies:
   '@remix-run/serve': 1.6.5_sfoxds7t5ydpegc3knd667wn6m
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
+  tiny-invariant: 1.2.0
 
 devDependencies:
   '@remix-run/dev': 1.6.5_oztcqjspdbj4ifc7kf4jpsfkcy
@@ -6836,6 +6838,10 @@ packages:
       readable-stream: 2.3.7
       xtend: 4.0.2
     dev: true
+
+  /tiny-invariant/1.2.0:
+    resolution: {integrity: sha512-1Uhn/aqw5C6RI4KejVeTg6mIS7IqxnLJ8Mv2tV5rTc0qWobay7pDUz6Wi392Cnc8ak1H0F2cjoRzb2/AW4+Fvg==}
+    dev: false
 
   /tmp/0.0.33:
     resolution: {integrity: sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==}

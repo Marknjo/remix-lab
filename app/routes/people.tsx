@@ -1,6 +1,7 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { Form, Link, useLoaderData } from '@remix-run/react';
+import invariant from 'tiny-invariant';
 import { getAllPeople } from '~/model/people.server';
 
 interface LoaderData {
@@ -19,8 +20,25 @@ export const loader: LoaderFunction = async () => {
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
+
   /// Handle form submission
-  console.log(Object.fromEntries(formData));
+  const userObj = Object.fromEntries(formData);
+
+  console.log(
+    typeof userObj.firstName !== 'string' || userObj.firstName !== ''
+  );
+
+  invariant(
+    typeof userObj.firstName !== 'string' || userObj.firstName !== '',
+    'Must provide a first name value as a string'
+  );
+
+  invariant(
+    typeof userObj.lastName !== 'string' || userObj.lastName !== '',
+    'Must provide a last name value as a string'
+  );
+
+  /// Create a user with the values
 
   return null;
 };
