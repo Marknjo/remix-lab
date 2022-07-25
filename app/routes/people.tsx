@@ -11,7 +11,7 @@ import {
 
 interface LoaderData {
   people: Array<{
-    id: number;
+    id: string;
     firstName: string;
     lastName: string;
   }>;
@@ -78,6 +78,10 @@ export const action: ActionFunction = async ({ request }) => {
   return null;
 };
 
+const blurStyle = {
+  color: 'text-gray-200',
+};
+
 export default function PeopleRoute() {
   let { people } = useLoaderData<LoaderData>();
 
@@ -89,6 +93,10 @@ export default function PeopleRoute() {
   const isAdding =
     transition.state === 'submitting' &&
     transition.submission?.formData.get('_action') === ActionTypes.CREATE;
+
+  const isDeleting =
+    transition.state === 'submitting' &&
+    transition.submission?.formData.get('_action') === ActionTypes.DELETE;
 
   useEffect(() => {
     if (!isAdding) {
@@ -109,7 +117,14 @@ export default function PeopleRoute() {
           className="grid grid-cols-1 py-6 px-4 divide-y divide-slate-200 shadow-sm mw-5/6"
         >
           {people.map(person => (
-            <li key={person.id} className="px-8 mb-2">
+            <li
+              key={person.id}
+              className={`px-8 mb-2 ${
+                transition.submission?.formData.get('id') === person.id
+                  ? blurStyle.color
+                  : ''
+              }`}
+            >
               <div className="text-lg inline-block space-x-4 py-2">
                 <p className="inline-block">
                   {person.firstName} {person.lastName}
@@ -120,6 +135,10 @@ export default function PeopleRoute() {
                     name="_action"
                     value={ActionTypes.DELETE}
                     className="text-sm text-gray-400 font-bold hover:text-red-500"
+                    disabled={
+                      isDeleting &&
+                      transition.submission?.formData.get('id') === person.id
+                    }
                   >
                     X
                   </button>
