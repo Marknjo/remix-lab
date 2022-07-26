@@ -71,8 +71,6 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   if (submittedPerson._action === ActionTypes.DELETE) {
-    console.log({ id: submittedPerson.id });
-
     /// Delete user
     const isPersonDeleted = await deletePerson(submittedPerson.id);
 
@@ -93,6 +91,10 @@ export const action: ActionFunction = async ({ request }) => {
 export default function PeopleRoute() {
   let { people } = useLoaderData<LoaderData>();
 
+  const transition = useTransition();
+  const isAdding =
+    transition.submission?.formData.get('_action') === ActionTypes.CREATE;
+
   return (
     <main className="flex flex-col items-center">
       <h1 className="min-w-full text-4xl mt-4 mb-4 font-semibold pb-2 border-b border-b-blue-300/25 text-center">
@@ -107,12 +109,23 @@ export default function PeopleRoute() {
           {people.map(person => (
             <DeletePersonItem key={person.id} person={person} />
           ))}
+
+          {isAdding && (
+            <DeletePersonItem
+              isOptimistic={true}
+              person={
+                Object.fromEntries(
+                  transition.submission?.formData!
+                ) as unknown as PersonData
+              }
+            />
+          )}
         </ul>
       ) : (
         <p className="text-center"></p>
       )}
 
-      <PersonForm />
+      <PersonForm isAdding={isAdding} />
 
       {/* Footer */}
       <div className="mt-8">
@@ -127,14 +140,9 @@ export default function PeopleRoute() {
   );
 }
 
-function PersonForm() {
-  const transition = useTransition();
-
+function PersonForm({ isAdding }: { isAdding: boolean | undefined }) {
   const createFormRef = useRef<HTMLFormElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
-
-  const isAdding =
-    transition.submission?.formData.get('_action') === ActionTypes.CREATE;
 
   useEffect(() => {
     if (isAdding) {
@@ -186,7 +194,13 @@ function PersonForm() {
   );
 }
 
-function DeletePersonItem({ person }: { person: PersonData }) {
+function DeletePersonItem({
+  person,
+  isOptimistic,
+}: {
+  person: PersonData;
+  isOptimistic?: boolean;
+}) {
   const fetcher = useFetcher();
 
   const isDeleting =
@@ -209,13 +223,17 @@ function DeletePersonItem({ person }: { person: PersonData }) {
         </p>
 
         <fetcher.Form method="post" className="inline-block">
-          <input type="hidden" name="id" defaultValue={person.id} />
+          {isOptimistic || (
+            <input type="hidden" name="id" defaultValue={person.id} />
+          )}
           <button
             name="_action"
             value={ActionTypes.DELETE}
             className="text-sm text-gray-400 font-bold hover:text-red-500"
             disabled={
-              isDeleting && fetcher.submission?.formData.get('id') === person.id
+              isOptimistic ||
+              (isDeleting &&
+                fetcher.submission?.formData.get('id') === person.id)
             }
           >
             X
