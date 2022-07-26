@@ -579,10 +579,6 @@ video {
   display: inline-block;
 }
 
-.inline {
-  display: inline;
-}
-
 .flex {
   display: flex;
 }
@@ -595,20 +591,12 @@ video {
   display: none;
 }
 
-.w-5\/6 {
-  width: 83.333333%;
-}
-
 .min-w-full {
   min-width: 100%;
 }
 
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
-}
-
-.grid-cols-3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .flex-col {
@@ -621,10 +609,6 @@ video {
 
 .justify-center {
   justify-content: center;
-}
-
-.gap-4 {
-  gap: 1rem;
 }
 
 .space-x-4 > :not([hidden]) ~ :not([hidden]) {
@@ -699,17 +683,8 @@ video {
   padding-right: 0.75rem;
 }
 
-.py-4 {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
-
 .pb-2 {
   padding-bottom: 0.5rem;
-}
-
-.pr-4 {
-  padding-right: 1rem;
 }
 
 .text-center {
@@ -749,19 +724,9 @@ video {
   color: rgb(59 130 246 / var(--tw-text-opacity));
 }
 
-.text-green-800 {
+.text-gray-200 {
   --tw-text-opacity: 1;
-  color: rgb(22 101 52 / var(--tw-text-opacity));
-}
-
-.text-red-500 {
-  --tw-text-opacity: 1;
-  color: rgb(239 68 68 / var(--tw-text-opacity));
-}
-
-.text-red-400 {
-  --tw-text-opacity: 1;
-  color: rgb(248 113 113 / var(--tw-text-opacity));
+  color: rgb(229 231 235 / var(--tw-text-opacity));
 }
 
 .text-gray-400 {
@@ -769,9 +734,9 @@ video {
   color: rgb(156 163 175 / var(--tw-text-opacity));
 }
 
-.text-gray-200 {
+.text-green-800 {
   --tw-text-opacity: 1;
-  color: rgb(229 231 235 / var(--tw-text-opacity));
+  color: rgb(22 101 52 / var(--tw-text-opacity));
 }
 
 .underline {
@@ -783,15 +748,15 @@ video {
   text-underline-offset: 2px;
 }
 
-.shadow-md {
-  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
 .shadow-sm {
   --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.shadow-md {
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 

@@ -1,6 +1,12 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { Form, Link, useLoaderData, useTransition } from '@remix-run/react';
+import {
+  Form,
+  Link,
+  useFetcher,
+  useLoaderData,
+  useTransition,
+} from '@remix-run/react';
 import { useEffect, useRef } from 'react';
 import invariant from 'tiny-invariant';
 import {
@@ -9,12 +15,14 @@ import {
   getAllPeople,
 } from '~/model/people.server';
 
+interface PersonData {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
 interface LoaderData {
-  people: Array<{
-    id: string;
-    firstName: string;
-    lastName: string;
-  }>;
+  people: Array<PersonData>;
 }
 
 enum ActionTypes {
@@ -85,26 +93,6 @@ const blurStyle = {
 export default function PeopleRoute() {
   let { people } = useLoaderData<LoaderData>();
 
-  const transition = useTransition();
-
-  const createFormRef = useRef<HTMLFormElement>(null);
-  const firstNameRef = useRef<HTMLInputElement>(null);
-
-  const isAdding =
-    transition.state === 'submitting' &&
-    transition.submission?.formData.get('_action') === ActionTypes.CREATE;
-
-  const isDeleting =
-    transition.state === 'submitting' &&
-    transition.submission?.formData.get('_action') === ActionTypes.DELETE;
-
-  useEffect(() => {
-    if (!isAdding) {
-      createFormRef.current?.reset();
-      firstNameRef.current?.focus();
-    }
-  }, [isAdding]);
-
   return (
     <main className="flex flex-col items-center">
       <h1 className="min-w-full text-4xl mt-4 mb-4 font-semibold pb-2 border-b border-b-blue-300/25 text-center">
@@ -117,79 +105,14 @@ export default function PeopleRoute() {
           className="grid grid-cols-1 py-6 px-4 divide-y divide-slate-200 shadow-sm mw-5/6"
         >
           {people.map(person => (
-            <li
-              key={person.id}
-              className={`px-8 mb-2 ${
-                transition.submission?.formData.get('id') === person.id
-                  ? blurStyle.color
-                  : ''
-              }`}
-            >
-              <div className="text-lg inline-block space-x-4 py-2">
-                <p className="inline-block">
-                  {person.firstName} {person.lastName}
-                </p>
-                <Form method="post" className="inline-block">
-                  <input type="hidden" name="id" defaultValue={person.id} />
-                  <button
-                    name="_action"
-                    value={ActionTypes.DELETE}
-                    className="text-sm text-gray-400 font-bold hover:text-red-500"
-                    disabled={
-                      isDeleting &&
-                      transition.submission?.formData.get('id') === person.id
-                    }
-                  >
-                    X
-                  </button>
-                </Form>
-              </div>
-            </li>
+            <DeletePersonItem key={person.id} person={person} />
           ))}
         </ul>
       ) : (
         <p className="text-center"></p>
       )}
 
-      <Form
-        method="post"
-        className="flex justify-center mt-10 mw-5/6 space-x-4 px-8 py-6 shadow-md border rounded"
-        ref={createFormRef}
-      >
-        <div className="mb-8 inline-block">
-          <input
-            aria-label="firstname"
-            ref={firstNameRef}
-            type="text"
-            name="firstName"
-            id="firstname"
-            className="border border-green-200 rounded-md shadow-sm py-2 px-3 hover:shadow-md hover:border-green-200/80 focus:border-green-600/40 outline-none"
-            placeholder="First Name"
-          />
-        </div>
-
-        <div className="mb-8 inline-block">
-          <input
-            aria-label="lastname"
-            type="text"
-            name="lastName"
-            id="lastname"
-            className="border border-green-200 rounded-md shadow-sm py-2 px-3 hover:shadow-md hover:border-green-200/80 focus:border-green-600/40 outline-none"
-            placeholder="Last Name"
-          />
-        </div>
-
-        <div className="mb-8 inline-block">
-          <button
-            name="_action"
-            value={ActionTypes.CREATE}
-            disabled={!!isAdding}
-            className="bg-green-200 rounded-md py-2 px-8 font-semibold text-green-800 shadow-sm transition hover:shadow-md hover:-translate-y-0.5 active:translate-y-[0.3]"
-          >
-            {isAdding ? 'Adding...' : 'Add'}
-          </button>
-        </div>
-      </Form>
+      <PersonForm />
 
       {/* Footer */}
       <div className="mt-8">
@@ -201,5 +124,103 @@ export default function PeopleRoute() {
         </Link>
       </div>
     </main>
+  );
+}
+
+function PersonForm() {
+  const transition = useTransition();
+
+  const createFormRef = useRef<HTMLFormElement>(null);
+  const firstNameRef = useRef<HTMLInputElement>(null);
+
+  const isAdding =
+    transition.state === 'submitting' &&
+    transition.submission?.formData.get('_action') === ActionTypes.CREATE;
+
+  useEffect(() => {
+    if (!isAdding) {
+      createFormRef.current?.reset();
+      firstNameRef.current?.focus();
+    }
+  }, [isAdding]);
+
+  return (
+    <Form
+      method="post"
+      className="flex justify-center mt-10 mw-5/6 space-x-4 px-8 py-6 shadow-md border rounded"
+      ref={createFormRef}
+    >
+      <div className="mb-8 inline-block">
+        <input
+          aria-label="firstname"
+          ref={firstNameRef}
+          type="text"
+          name="firstName"
+          id="firstname"
+          className="border border-green-200 rounded-md shadow-sm py-2 px-3 hover:shadow-md hover:border-green-200/80 focus:border-green-600/40 outline-none"
+          placeholder="First Name"
+        />
+      </div>
+
+      <div className="mb-8 inline-block">
+        <input
+          aria-label="lastname"
+          type="text"
+          name="lastName"
+          id="lastname"
+          className="border border-green-200 rounded-md shadow-sm py-2 px-3 hover:shadow-md hover:border-green-200/80 focus:border-green-600/40 outline-none"
+          placeholder="Last Name"
+        />
+      </div>
+
+      <div className="mb-8 inline-block">
+        <button
+          name="_action"
+          value={ActionTypes.CREATE}
+          disabled={!!isAdding}
+          className="bg-green-200 rounded-md py-2 px-8 font-semibold text-green-800 shadow-sm transition hover:shadow-md hover:-translate-y-0.5 active:translate-y-[0.3]"
+        >
+          {isAdding ? 'Adding...' : 'Add'}
+        </button>
+      </div>
+    </Form>
+  );
+}
+
+function DeletePersonItem({ person }: { person: PersonData }) {
+  const fetcher = useFetcher();
+
+  const isDeleting =
+    fetcher.state === 'submitting' &&
+    fetcher.submission?.formData.get('_action') === ActionTypes.DELETE;
+
+  return (
+    <li
+      className={`px-8 mb-2 ${
+        fetcher.submission?.formData.get('id') === person.id
+          ? blurStyle.color
+          : ''
+      }`}
+    >
+      <div className="text-lg inline-block space-x-4 py-2">
+        <p className="inline-block">
+          {person.firstName} {person.lastName}
+        </p>
+
+        <fetcher.Form method="post" className="inline-block">
+          <input type="hidden" name="id" defaultValue={person.id} />
+          <button
+            name="_action"
+            value={ActionTypes.DELETE}
+            className="text-sm text-gray-400 font-bold hover:text-red-500"
+            disabled={
+              isDeleting && fetcher.submission?.formData.get('id') === person.id
+            }
+          >
+            X
+          </button>
+        </fetcher.Form>
+      </div>
+    </li>
   );
 }
