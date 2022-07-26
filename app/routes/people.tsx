@@ -86,9 +86,9 @@ export const action: ActionFunction = async ({ request }) => {
   return null;
 };
 
-const blurStyle = {
-  color: 'text-gray-200',
-};
+// const blurStyle = {
+//   color: 'text-gray-200',
+// };
 
 export default function PeopleRoute() {
   let { people } = useLoaderData<LoaderData>();
@@ -134,11 +134,10 @@ function PersonForm() {
   const firstNameRef = useRef<HTMLInputElement>(null);
 
   const isAdding =
-    transition.state === 'submitting' &&
     transition.submission?.formData.get('_action') === ActionTypes.CREATE;
 
   useEffect(() => {
-    if (!isAdding) {
+    if (isAdding) {
       createFormRef.current?.reset();
       firstNameRef.current?.focus();
     }
@@ -191,16 +190,18 @@ function DeletePersonItem({ person }: { person: PersonData }) {
   const fetcher = useFetcher();
 
   const isDeleting =
-    fetcher.state === 'submitting' &&
     fetcher.submission?.formData.get('_action') === ActionTypes.DELETE;
 
   return (
     <li
-      className={`px-8 mb-2 ${
-        fetcher.submission?.formData.get('id') === person.id
-          ? blurStyle.color
-          : ''
-      }`}
+      hidden={isDeleting}
+      // className={`px-8 mb-2 ${
+      //   fetcher.submission?.formData.get('id') === person.id
+      //     ? blurStyle.color
+      //     : ''
+      // }`}
+
+      className="px-8 mb-2"
     >
       <div className="text-lg inline-block space-x-4 py-2">
         <p className="inline-block">
